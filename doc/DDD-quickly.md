@@ -1,0 +1,7 @@
+# Tóm tắt sách DDD - Quickly
+## Domain-Driven Design là gì?
+Phát triển phần mềm là qui trình tự động hóa được áp dụng thường xuyên nhất trên thế giới, nó cũng là sự cung cấp giải pháp cho những bài toán nghiệp vụ thực tế. Qui trình nghiệp vụ được tự động hóa hoặc những bài toán thực tế mà ở đó phần mềm là một lĩnh vực của nghiệp vụ. Chúng ta phải hiểu từ đầu rằng phần mềm bắt nguồn và liên quan rất sâu tới domain này. Bạn không thể làm ra hệ thống phần mềm ngân hàng nếu trừ khi bạn có hiểu biết tương đối tốt về mảng ngân hàng và những điều liên quan. Nghĩa là, để làm phần mềm tốt, bạn cần hiểu lĩnh vực ngân hàng.
+
+Khi chúng ta bắt đầu một dự án phần mềm, ta nên tập trung vào domain và hoạt động trong nó. Mục đích của cả phần mềm là để đề cao một domain cụ thể. Để làm được điều đó, phần mềm cần hài hòa với domain mà nó tạo nên. Nếu không nó sẽ gây nên sự căng thẳng với domain, dẫn tới hoạt động sai, phá hoại hay thậm chí rối loạn không kiểm soát được.
+
+Vậy làm thế nào để làm ra phần mềm hài hòa với domain? Cách tốt nhất để làm việc đó là hãy làm cho phần mềm phản chiếu tới domain. Phần mềm cần hợp nhất với những khái niệm và thành phần cốt lõi của domain, và hiện thực hóa một cách chính xác quan hệ giữa chúng. Phần mềm phải mô hình hóa được domain.
