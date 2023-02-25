@@ -1,3 +1,6 @@
+import os
+from dotenv import load_dotenv
+
 from typing import TypedDict
 from pymongo import MongoClient
 
@@ -7,6 +10,7 @@ __all__ = [
     "MongoConnection"
 ]
 
+load_dotenv()
 
 class ConfigMongo(TypedDict):
     """
@@ -17,6 +21,14 @@ class ConfigMongo(TypedDict):
     password: str
     hostname: str
     port: str
+
+config_mongo_schema=ConfigMongo(
+    type_mongo_cloud=os.getenv("MDB_TYPE_CLOUD", False),
+    hostname=os.getenv("MDB_HOSTNAME"),
+    port=os.getenv("MDB_PORT"),
+    username=os.getenv("MDB_USERNAME"),
+    password=os.getenv("MDB_PASSWORD")
+)
 
 class MongoConnection:
     """
@@ -32,7 +44,7 @@ class MongoConnection:
     config: ConfigMongo
     client: MongoClient
 
-    def __init__(self, config: ConfigMongo) -> None:
+    def __init__(self, config: ConfigMongo=config_mongo_schema) -> None:
         self.config = config
         try:
             self.client = self.create_connection()
