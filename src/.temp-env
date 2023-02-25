@@ -1,0 +1,6 @@
+# MongoDB Configuration
+MDB_TYPE_CLOUD = TRUE
+MDB_USERNAME = ""
+MDB_PASSWORD = ""
+MDB_HOSTNAME = ""
+MDB_PORT = ""
