@@ -1,80 +1,66 @@
-from .model.db import create_connection_mdb
 from .utils.login_processing import *
-
-# from typing import Union
-import jwt
 from fastapi import FastAPI
-from datetime import datetime, timedelta
 
-app = FastAPI()
+description = """
 
-@app.get("/", status_code=200)
-async def root():
-    return {"message": "Login-CTT-SIS Microservices, "}
+Login service School systems
 
-@app.get("/api/v1/admin/users", description="Get information account in SIS, ")
-async def get_all_users():
-    response = []
-    ## Query in mongodb account with client
-    try: 
-        conn = create_connection_mdb(database_name="login_service", collection_name="accounts")
-        response = list(conn.find({}))
-        if response:
-            return response
-        else:
-            return {
-                "meassage": "Server Empty!",
-                "status_code": 500
-            }
-    except Exception as e:
-        return {
-            "message": e
-        }
+## Description:
+Simulation some simple case to Login service of sis
 
-@app.post("/api/v1/users/login", description="Login sis account")
+## Privilege:
+
+* **Users**:
+
+    - **Login to systems** by username and password signed
+    - **Sign up** with username, password and more information in detail
+    - **See personal profile** has signed to sis
+    - 
+
+* **Admin**:
+
+    - **All of privilege in users**
+    - **Show informations of all account in sis**: by /api/v1/admin/users
+    - **Grant admin to one or more signed users**
+
+"""
+
+tags_metadata = [
+    {
+        "name": "basic",
+        "description": "Operations with users. The **login** logic is also here.",
+    },
+    {
+        "name": "admin",
+        "description": "Manage other users"
+    },
+]
+
+
+app = FastAPI(
+    title="Login service for SIS",
+    version="v1.0.1",
+    description=description,
+    openapi_tags=tags_metadata,
+    contact={
+        "name": "Dat Trong Ha - 20195851",
+        "email": "dat.ht195851@sis.hust.edu.vn"
+    },
+    docs_url='/'
+)
+
+@app.post("/api/v1/users/login", description="Login sis account", tags=['basic'])
 async def login(request: LoginRequest):
-    valid_user, conn = validate_user(request)
-    if valid_user:
-        user = valid_user[0]
-        conn.update_one(
-            {
-                "username": user.get("username")
-            },
-            {
-                "$set": {
-                    "last_login": datetime.now()
-                }
-            }
-        )
-        return {
-            "message": f"Hello {valid_user.get('username', '')}", ## name or something to show that exists
-            "info": valid_user.__dict__
-        }
-    else:
-        return {
-            "message": "This account hasn't existed yet, please sign up to continue!",
-            "status_code": 403
-        }
+    return process_login(request)
 
-@app.post("/api/v1/users", description="Sign-up account to sis")
+@app.post("/api/v1/users", description="Sign-up account to sis", tags=['basic'])
 async def sign_up(request: SignUpRequest):
-    exist_acc, conn = exists_account(request)
-    if not exist_acc:
-        ## Insert to mongodb:
-        new_user = request.__dict__
-        new_user.update({"create_account_time": datetime.now()})
-        secret_key = f'{new_user.get("username")}{new_user.get("username")}{new_user.get("create_account_time")}'
-        token = jwt.encode(new_user, secret_key, algorithm='HS256')
-        new_user.update({"secret_key": f'sis_{token}'})
-        conn.insert_one(new_user)
-        return {
-            "message": "Sign up completed!",
-            "status_code": 200,
-            "info_account": request.__dict__
-        }
-    else:
-        return {
-            "meassage": "Error, please try again!",
-            "status_code": 500
-        }
+    return process_sign_up(request)
+
+@app.get("/api/v1/admin/accounts", description="Get information account in SIS, ", tags=['admin'])
+async def get_all_users():
+    return process_get_all_users()
     
+@app.put("/api/v1/admin/grants/{username}/{value}", tags=['admin'])
+async def set_privilege_user(username: str, value: str):
+    return process_set_privilege_user(username, value)
