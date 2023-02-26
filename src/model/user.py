@@ -11,4 +11,5 @@ class Account(BaseModel):
     phone_number: str
     identity_number: str
     birthday: date
+    secret_token: str
 

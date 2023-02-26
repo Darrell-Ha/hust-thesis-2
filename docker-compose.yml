@@ -1,0 +1,32 @@
+version: "3.9"
+services:
+  mongodb:
+    image: mongo:4.0.4
+    container_name: project2_login_mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - "./config/mongod.conf:/data/configdb/mongod.conf:ro"
+      - "./data:/data/db"
+      - "./log:/var/log/mongodb"
+    command: ["/usr/bin/mongod", "-f", "/data/configdb/mongod.conf"]
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: hadat
+      MONGO_INITDB_ROOT_PASSWORD: admin
+
+  api:
+    image: test_thesis_2_1:latest
+    restart: always
+    container_name: api_login_service
+    ports:
+      - "8000:86"
+    environment:
+      - MONGODB_HOST=mongodb
+      - MONGODB_PORT=27017
+      - MONGODB_DATABASE=login_service
+    
+  
+# volumes:
+#   data:
+#   log: null

@@ -2,15 +2,26 @@ import os
 from dotenv import load_dotenv
 
 from typing import TypedDict
-from pymongo import MongoClient
-
-
-__all__ = [
-    "ConfigMongo",
-    "MongoConnection"
-]
+from pymongo import MongoClient, collection
 
 load_dotenv()
+
+__all__ = [
+    "create_connection_mdb"
+]
+
+
+def create_connection_mdb(collection_name: str, database_name: str="login_services") -> collection.Collection:
+    colltn = None
+    new_client = MongoConnection().get_client()
+    if database_name in new_client.list_database_names():
+        db = new_client.get_database(database_name)
+        if collection_name in db.list_collection_names():
+            colltn = db.get_collection(collection_name)
+            return colltn
+        else:
+            raise ValueError(f"Collection: {collection_name} not found!")
+    raise ValueError(f"Database: {database_name} not found!!")
 
 class ConfigMongo(TypedDict):
     """
@@ -23,7 +34,7 @@ class ConfigMongo(TypedDict):
     port: str
 
 config_mongo_schema=ConfigMongo(
-    type_mongo_cloud=os.getenv("MDB_TYPE_CLOUD", False),
+    type_mongo_cloud=bool(os.getenv("MDB_TYPE_CLOUD", False)),
     hostname=os.getenv("MDB_HOSTNAME"),
     port=os.getenv("MDB_PORT"),
     username=os.getenv("MDB_USERNAME"),
