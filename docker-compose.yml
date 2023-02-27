@@ -39,9 +39,9 @@ services:
       - login_service_mongodb
     
   
-# volumes:
-#   data:
-#   log: null
+volumes:
+  data:
+  log:
 
 networks:
   login_service_mongodb:

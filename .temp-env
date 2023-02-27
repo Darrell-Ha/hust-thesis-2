@@ -1,0 +1,9 @@
+# MongoDB Configuration
+# MDB_TYPE_CLOUD = TRUE
+# MDB_USERNAME = ""
+# MDB_PASSWORD = ""
+# MDB_HOSTNAME = ""
+# MDB_PORT = ""
+
+# JWT_SECRET_KEY = <...>
+# JWT_SECRET_ALGORITHM = <...>

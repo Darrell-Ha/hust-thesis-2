@@ -1,5 +1,5 @@
 from .utils.login_processing import *
-from fastapi import FastAPI
+from fastapi import FastAPI, Header
 
 description = """
 
@@ -49,21 +49,28 @@ app = FastAPI(
     docs_url='/'
 )
 
-@app.post("/api/v1/users/login", description="Login sis account", tags=['basic'])
+@app.post("/api/v1/users/login", description="Login sis account to see information account", tags=['basic'])
 async def login(request: LoginRequest):
     return process_login(request)
 
-@app.post("/api/v1/users", description="Sign-up account to sis", tags=['basic'])
+@app.post("/api/v1/users/signup", description="Sign-up account to sis", tags=['basic'])
 async def sign_up(request: SignUpRequest):
     return process_sign_up(request)
 
-# @app.post("/api/v1/users/{username}/info", description="Show information of given username", tags=['basic'])
-# async def show_info()
+@app.put("/api/v1/users/{username}/change_info", description="Change info account" , tags=['basic'])
+async def change_info(username: str, request: ChangeInfoRequest, token: str = Header(alias="x_secret_token")):
+    return process_change_info(username, request, token)
+
 
 @app.get("/api/v1/admin/accounts", description="Get information account in SIS, ", tags=['admin'])
-async def get_all_users():
-    return process_get_all_users()
+async def get_all_users(token_admin: str = Header(alias="x_secret_token")):
+    return process_get_all_users(token_admin)
     
-@app.put("/api/v1/admin/grants/{username}/{role}", tags=['admin'])
-async def set_privilege_user(username: str, role: RoleName):
-    return process_set_privilege_user(username, role)
+# @app.get("/api/v1/admin/accounts/{identity_number}/info", description="Show information of given username", tags=['admin'])
+# async def get_info_account(identity_number: str):
+#     return process_get_info_account(identity_number)
+
+# @app.delete("/api/v1/admin/offs/{identity_number}", description="Delete account with given username", tags=['admin'])
+# async def delete_account(identity_number: str):
+#     return process_get_info_account(identity_number)
+    
