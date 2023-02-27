@@ -1,0 +1,72 @@
+[
+    {
+        "user_type": "student",
+        "username": "hadat",
+        "password": "123456",
+        "first_name": "Dat",
+        "last_name": "Ha",
+        "phone_number": "0987654321",
+        "identity_number": "20195851",
+        "birthday": "2001-09-21"
+    },
+    {
+        "user_type":"admin",
+        "username":"minhdai",
+        "password":"894911",
+        "first_name":"minh",
+        "last_name":"dai",
+        "phone_number":"0987127323",
+        "identity_number":"00001232",
+        "birthday":"1983-02-06"
+    },
+    {
+        "user_type":"admin",
+        "username":"nhanchinh",
+        "password":"364532",
+        "first_name":"nhan",
+        "last_name":"chinh",
+        "phone_number":"0981724562",
+        "identity_number":"00002334",
+        "birthday":"1987-05-03"
+    },
+    {
+        "user_type":"student",
+        "username":"phuongnga",
+        "password":"547361",
+        "first_name":"nga",
+        "last_name":"phuong",
+        "phone_number":"03271829374",
+        "identity_number":"20191233",
+        "birthday":"2001-08-07"
+    },
+    {
+        "user_type":"student",
+        "username":"sonlam",
+        "password":"421938",
+        "first_name":"son",
+        "last_name":"lam",
+        "phone_number":"0321284652",
+        "identity_number":"20195123",
+        "birthday":"2001-03-04"
+    },
+    {
+        "user_type":"student",
+        "username":"haidang",
+        "password":"430029",
+        "first_name":"hai",
+        "last_name":"dang",
+        "phone_number":"0123485261",
+        "identity_number":"20187943",
+        "birthday":"2001-02-01"
+    },
+    {
+        "user_type":"student",
+        "username":"trieukhuc",
+        "password":"871068",
+        "first_name":"trieu",
+        "last_name":"khuc",
+        "phone_number":"0482638412",
+        "identity_number":"20193421",
+        "birthday":"2001-07-09"
+    }
+]

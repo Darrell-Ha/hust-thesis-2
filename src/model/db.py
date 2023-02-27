@@ -11,17 +11,15 @@ __all__ = [
 ]
 
 
-def create_connection_mdb(collection_name: str, database_name: str="login_services") -> collection.Collection:
+def create_connection_mdb(collection_name: str, database_name: str="login_service") -> collection.Collection:
     colltn = None
-    new_client = MongoConnection().get_client()
-    if database_name in new_client.list_database_names():
-        db = new_client.get_database(database_name)
-        if collection_name in db.list_collection_names():
-            colltn = db.get_collection(collection_name)
-            return colltn
-        else:
-            raise ValueError(f"Collection: {collection_name} not found!")
-    raise ValueError(f"Database: {database_name} not found!!")
+    mongo = MongoConnection()
+    new_client = mongo.get_client()
+    # exists_db = database_name in new_client.list_database_names()
+    db = new_client.get_database(database_name)
+    # exists_colltn = collection_name in db.list_collection_names()
+    colltn = db.get_collection(collection_name)
+    return colltn
 
 class ConfigMongo(TypedDict):
     """
@@ -55,7 +53,7 @@ class MongoConnection:
     config: ConfigMongo
     client: MongoClient
 
-    def __init__(self, config: ConfigMongo=config_mongo_schema) -> None:
+    def __init__(self, config: ConfigMongo=config_mongo_schema):
         self.config = config
         try:
             self.client = self.create_connection()

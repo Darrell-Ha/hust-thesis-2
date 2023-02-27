@@ -57,10 +57,13 @@ async def login(request: LoginRequest):
 async def sign_up(request: SignUpRequest):
     return process_sign_up(request)
 
+# @app.post("/api/v1/users/{username}/info", description="Show information of given username", tags=['basic'])
+# async def show_info()
+
 @app.get("/api/v1/admin/accounts", description="Get information account in SIS, ", tags=['admin'])
 async def get_all_users():
     return process_get_all_users()
     
-@app.put("/api/v1/admin/grants/{username}/{value}", tags=['admin'])
-async def set_privilege_user(username: str, value: str):
-    return process_set_privilege_user(username, value)
+@app.put("/api/v1/admin/grants/{username}/{role}", tags=['admin'])
+async def set_privilege_user(username: str, role: RoleName):
+    return process_set_privilege_user(username, role)

@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from enum import Enum
 from datetime import date
 
 class Account(BaseModel):
@@ -27,8 +28,13 @@ class SignUpRequest(BaseModel):
     identity_number: str
     birthday: date
 
+class RoleName(str, Enum):
+    admin = "admin"
+    student = "student"
+
 __all__ = [
     "Account",
     "SignUpRequest",
-    "LoginRequest"
+    "LoginRequest",
+    "RoleName"
 ]

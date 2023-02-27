@@ -6,27 +6,43 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      # - "./config/mongod.conf:/data/configdb/mongod.conf:ro"
+      # - "./config/mongod.conf:/data/configdb/mongod.conf"
       - "./data:/data/db"
       - "./log:/var/log/mongodb"
     # command: ["/usr/bin/mongod", "-f", "/data/configdb/mongod.conf"]
     restart: always
-    # environment:
-    #   MONGO_INITDB_ROOT_USERNAME: hadat
-    #   MONGO_INITDB_ROOT_PASSWORD: admin
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=hadat
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+      - MONGO_INITDB_DATABASE=login_service
+    
+    # command: [mongo -u hadat -p admin --authenticationDatabase admin]
+    networks:
+      - login_service_mongodb
 
   api:
+    build:
+      dockerfile: Dockerfile
     image: test_thesis_2_1:latest
     restart: always
     container_name: api_login_service
     ports:
       - "8000:86"
+    depends_on:
+      - mongodb
     environment:
-      - MONGODB_HOST=mongodb
-      - MONGODB_PORT=27017
-      - MONGODB_DATABASE=login_service
+      WAIT_HOSTS: mongodb:27017
+    #   MDB_HOST: mongodb
+    #   MDB_PORT: 27017
+    #   MDB_DATABASE: login_service
+    networks:
+      - login_service_mongodb
     
   
 # volumes:
 #   data:
 #   log: null
+
+networks:
+  login_service_mongodb:
+    driver: bridge
