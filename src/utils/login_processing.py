@@ -1,18 +1,10 @@
-import jwt
-import os
 from fastapi import HTTPException, status
-from dotenv import load_dotenv
 from typing import Tuple
 from datetime import datetime
 from pymongo.collection import Collection
 from src.model.db import create_connection_mdb
 from src.model.user import *
-
-
-load_dotenv("src/.env")
-
-JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
-JWT_SECRET_ALGORITHM = os.getenv("JWT_SECRET_ALGORITHM")
+from .prepare_str import *
 
 __all__ = [
     "LoginRequest",
@@ -21,18 +13,10 @@ __all__ = [
     "process_login",
     "process_sign_up",
     "process_get_all_users",
-    "process_change_info"
+    "process_change_info",
+    "process_delete_account"
 ]
 
-def sanitize_key(token: str) -> str:
-    return token.replace("-","").replace("_", "")
-
-def generate_token(payload: dict) -> str:
-    if JWT_SECRET_ALGORITHM and JWT_SECRET_ALGORITHM:
-        return sanitize_key(jwt.encode(payload, key=JWT_SECRET_KEY, algorithm=JWT_SECRET_ALGORITHM).split(".")[2])
-    else:
-        raise ValueError(
-            "KEY OR ALGORITHMS FOR GENERATE TOKEN HAVEN'T DEFINED!")
 
 def validate_user(username: str, password: str) -> Tuple[dict, Collection]:
     '''
@@ -77,7 +61,7 @@ def exists_account_by_token(token: str) -> Tuple[dict, Collection]:
 
 
 def process_login(request: LoginRequest) -> dict:
-    
+
     username = request.username
     password = request.password
     valid_user, conn = validate_user(username, password)
@@ -115,8 +99,8 @@ def process_sign_up(request: SignUpRequest) -> dict:
         new_user = request.dict()
         new_user.update(
             {
-                "create_account_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                "birthday": new_user.get("birthday", "").strftime("%Y-%m-%d")
+                "create_account_time": convert_datetime_to_str(datetime.now()),
+                "birthday": convert_date_to_str(new_user.get("birthday", ""))
             }
         )
         token = generate_token(new_user)
@@ -138,9 +122,11 @@ def process_sign_up(request: SignUpRequest) -> dict:
 def process_change_info(username: str, info_change: ChangeInfoRequest, token: str) -> dict:
     exists_acc, conn = exists_account_by_token(token)
     if exists_acc.get("username", "") == username:
-        new_info = {item for item in info_change.dict().items()
-                    if item[1] != None}
-        conn.update_one({"secret_key": token}, new_info)
+        new_info = standardize_json({item[0]: item[1] for item in dict(info_change.dict()).items()
+                                     if item[1] != None})
+        new_info.update(
+            {"last_updated_time": convert_datetime_to_str(datetime.now())})
+        conn.update_one({"secret_key": token}, {"$set": new_info})
         new_info_acc = conn.find_one({"secret_key": token}, {"_id": 0})
         new_info_acc = {} if new_info_acc is None else dict(new_info_acc)
         return {
@@ -154,6 +140,7 @@ def process_change_info(username: str, info_change: ChangeInfoRequest, token: st
             detail="You can't change infomation of other accounts"
         )
 
+
 def process_get_all_users(token: str) -> dict:
     results_query = []
     # check token is owned by admin or not
@@ -161,7 +148,7 @@ def process_get_all_users(token: str) -> dict:
     # admin_acc = {}
     if admin_acc.get("user_type", "student") == "admin":
         # Admin can query the list
-        results_query = list(conn.find({}, {"_id", 0}))
+        results_query = list(conn.find({}, {"_id": 0}))
         print(results_query)
         if results_query:
             return {
@@ -173,6 +160,23 @@ def process_get_all_users(token: str) -> dict:
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                 detail="Server Empty!"
             )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="This action is not authorized to you"
+        )
+
+
+def process_delete_account(identity_number: str, token: str) -> dict:
+    # check token is owned by admin or not
+    admin_acc, conn = exists_account_by_token(token=token)
+    # admin_acc = {}
+    if admin_acc.get("user_type", "student") == "admin":
+        res = conn.delete_one({"identity_number": identity_number})
+        if res.deleted_count > 0:
+            return {
+                "message": f"Delete student: {identity_number} successfully",
+            }
     else:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
