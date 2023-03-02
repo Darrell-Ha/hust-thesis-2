@@ -11,6 +11,8 @@ JWT_SECRET_ALGORITHM = os.getenv("JWT_SECRET_ALGORITHM")
 
 __all__ = [
     "generate_token",
+    "generate_sis_token",
+    "decode_token",
     "sanitize_key",
     "standardize_json",
     "convert_date_to_str",
@@ -21,6 +23,20 @@ def sanitize_key(token: str) -> str:
     return token.replace("-","").replace("_", "")
 
 def generate_token(payload: dict) -> str:
+    if JWT_SECRET_ALGORITHM and JWT_SECRET_ALGORITHM:
+        return jwt.encode(payload, key=JWT_SECRET_KEY, algorithm=JWT_SECRET_ALGORITHM)
+    else:
+        raise ValueError(
+            "KEY OR ALGORITHMS FOR GENERATE TOKEN HAVEN'T DEFINED!")
+
+def decode_token(token_str: str) -> dict:
+    if JWT_SECRET_ALGORITHM and JWT_SECRET_ALGORITHM:
+        return jwt.decode(token_str, key=JWT_SECRET_KEY, algorithms=JWT_SECRET_ALGORITHM)
+    else:
+        raise ValueError(
+            "KEY OR ALGORITHMS FOR GENERATE TOKEN HAVEN'T DEFINED!")
+    
+def generate_sis_token(payload: dict) -> str:
     if JWT_SECRET_ALGORITHM and JWT_SECRET_ALGORITHM:
         return sanitize_key(jwt.encode(payload, key=JWT_SECRET_KEY, algorithm=JWT_SECRET_ALGORITHM).split(".")[2])
     else:

@@ -24,13 +24,16 @@ def validate_user(username: str, password: str) -> Tuple[dict, Collection]:
     '''
     conn = create_connection_mdb(collection_name="accounts")
     res = conn.find_one(
-        {"$and": [
-            {"username": username},
-            {"password": password}
-        ]},
+        {"username": username},
         {"_id": 0}
     )
-    user = {} if res is None else dict(res)
+    user_pass = {} if res is None else dict(res)
+    user_in_sis = decode_token(user_pass.get("password", ""))
+    if user_in_sis.get("username", "") == username and user_in_sis.get("password", "") == password:
+        user = user_pass
+        user.pop("password")
+    else:
+        user = {}
     return user, conn
 
 
@@ -96,15 +99,20 @@ def process_sign_up(request: SignUpRequest) -> dict:
     exist_acc, conn = exists_account(username, identity_number)
     if not exist_acc:
         # Insert to mongodb:
-        new_user = request.dict()
+        new_user = dict(request.dict())
+        info_log = {
+            "username": new_user.get("username", ""),
+            "password": new_user.get("password", "")
+        }
         new_user.update(
             {
+                "password": generate_token(info_log),
                 "create_account_time": convert_datetime_to_str(datetime.now()),
                 "birthday": convert_date_to_str(new_user.get("birthday", ""))
             }
         )
-        token = generate_token(new_user)
-        new_user.update({"secret_key": f'sis_{token}'})
+        sis_token = generate_sis_token(new_user)
+        new_user.update({"secret_key": f'sis_{sis_token}'})
         result = new_user.copy()
         conn.insert_one(new_user)
         return {
@@ -126,6 +134,12 @@ def process_change_info(username: str, info_change: ChangeInfoRequest, token: st
                                      if item[1] != None})
         new_info.update(
             {"last_updated_time": convert_datetime_to_str(datetime.now())})
+        if any(field in new_info.keys() for field in {"username", "password"}):
+            new_info_log = {
+                "username": new_info.get("username", exists_acc['username']),
+                "password": new_info.get("password", exists_acc['password'])
+            }
+            new_info.update({'password': generate_token(new_info_log)})
         conn.update_one({"secret_key": token}, {"$set": new_info})
         new_info_acc = conn.find_one({"secret_key": token}, {"_id": 0})
         new_info_acc = {} if new_info_acc is None else dict(new_info_acc)

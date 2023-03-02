@@ -46,7 +46,7 @@ Ngoài ra, trong kiến trúc microservices có thể có thêm một số thàn
 
 - Management/orchestration: giúp cân bằng các services trên các nodes hoặc instance và xác định lỗi trong quá trình chạy.
 
-- API Gateway: Trạm cho phép chuyển các yêu cầu từ client đến các microservices tương ứng. Việc sử dụng API Gateway là một tùy chọn của hệ thống và nó đem lại nhiều lợi ích dễ dàng nâng cấp và tái cấu trúc mà không cập nhật bên phía clients. Đồng thời giúp tách biệt các quá trình xác thực, ghi log, giải mã bảo mật và cân bằng tải. Ngoài ra còn có thể thực hiện phân quyền để áp dụng chính sách theo yêu cầu của hệ thống.
+- API Gateway: Trạm cho phép chuyển các yêu cầu từ client đến các microservices tương ứng. Việc sử dụng API Gateway là một tùy chọn của hệ thống và nó đem lại nhiều lợi ích dễ dàng nâng cấp và tái cấu trúc mà không cập nhật bên phía clients. Đồng thời giúp tách biệt các quá trình xác thực, ghi log, giải mã     bảo mật và cân bằng tải. Ngoài ra còn có thể thực hiện phân quyền để áp dụng chính sách theo yêu cầu của hệ thống.
 
 ## Lợi ích và hạn chế của Microservices
 
