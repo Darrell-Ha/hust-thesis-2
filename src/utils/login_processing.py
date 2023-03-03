@@ -14,7 +14,8 @@ __all__ = [
     "process_sign_up",
     "process_get_all_users",
     "process_change_info",
-    "process_delete_account"
+    "process_delete_account",
+    "GetAllRequest"
 ]
 
 
@@ -28,10 +29,13 @@ def validate_user(username: str, password: str) -> Tuple[dict, Collection]:
         {"_id": 0}
     )
     user_pass = {} if res is None else dict(res)
-    user_in_sis = decode_token(user_pass.get("password", ""))
-    if user_in_sis.get("username", "") == username and user_in_sis.get("password", "") == password:
-        user = user_pass
-        user.pop("password")
+    if user_pass:
+        user_in_sis = decode_token(user_pass.get("password", ""))
+        if user_in_sis.get("username", "") == username and user_in_sis.get("password", "") == password:
+            user = user_pass
+            user.pop("password")
+        else:
+            user = {}
     else:
         user = {}
     return user, conn
@@ -127,25 +131,27 @@ def process_sign_up(request: SignUpRequest) -> dict:
         )
 
 
-def process_change_info(username: str, info_change: ChangeInfoRequest, token: str) -> dict:
+def process_change_info(info_change: ChangeInfoRequest) -> dict:
+    info_change_json = dict(info_change.dict())
+    token = info_change_json['x_secret_token']
+    info_change_json.pop('x_secret_token')
+    username = info_change_json['username']
+    info_change_json.pop('username')
     exists_acc, conn = exists_account_by_token(token)
     if exists_acc.get("username", "") == username:
-        new_info = standardize_json({item[0]: item[1] for item in dict(info_change.dict()).items()
-                                     if item[1] != None})
-        new_info.update(
+        new_info_log = {
+            "username": username,
+            "password": info_change_json['password']
+        }
+        new_info_log.update({'password': generate_token(new_info_log)})
+        new_info_log.update(
             {"last_updated_time": convert_datetime_to_str(datetime.now())})
-        if any(field in new_info.keys() for field in {"username", "password"}):
-            new_info_log = {
-                "username": new_info.get("username", exists_acc['username']),
-                "password": new_info.get("password", exists_acc['password'])
-            }
-            new_info.update({'password': generate_token(new_info_log)})
-        conn.update_one({"secret_key": token}, {"$set": new_info})
+        conn.update_one({"secret_key": token}, {"$set": new_info_log})
         new_info_acc = conn.find_one({"secret_key": token}, {"_id": 0})
         new_info_acc = {} if new_info_acc is None else dict(new_info_acc)
         return {
             "message": "Update successfully!",
-            "update_info": [item[0] for item in info_change.dict().items() if item[1] != None],
+            # "update_info": [item[0] for item in info_change.dict().items() if item[1] != None],
             "result": new_info_acc
         }
     else:
@@ -154,8 +160,8 @@ def process_change_info(username: str, info_change: ChangeInfoRequest, token: st
             detail="You can't change infomation of other accounts"
         )
 
-
-def process_get_all_users(token: str) -> dict:
+def process_get_all_users(request: GetAllRequest) -> dict:
+    token = dict(request.dict())['x_secret_token']
     results_query = []
     # check token is owned by admin or not
     admin_acc, conn = exists_account_by_token(token=token)

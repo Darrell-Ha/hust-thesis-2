@@ -49,7 +49,7 @@ def convert_date_to_str(_date: date) -> str:
 def convert_datetime_to_str(_datetime: datetime) -> str:
     return _datetime.strftime("%Y-%m-%d %H:%M:%S")
 
-def standardize_json(_json: dict):
+def standardize_json(_json: dict) -> dict:
     for item in _json.items():
         if isinstance(item[1], date):
             _json.update({item[0]: convert_date_to_str(item[1])})

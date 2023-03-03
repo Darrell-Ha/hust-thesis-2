@@ -29,18 +29,23 @@ class SignUpRequest(BaseModel):
     birthday: date
 
 class ChangeInfoRequest(BaseModel):
-    username: Union[str, None]
-    password: Union[str, None]
-    first_name: Union[str, None]
-    last_name: Union[str, None]
-    phone_number: Union[str, None]
-    identity_number: Union[str, None]
-    birthday: Union[date, None]
+    username: str
+    x_secret_token: str
+    # username: Union[str, None]
+    password: str
+    # first_name: Union[str, None]
+    # last_name: Union[str, None]
+    # phone_number: Union[str, None]
+    # identity_number: Union[str, None]
+    # birthday: Union[date, None]
 
+class GetAllRequest(BaseModel):
+    x_secret_token: str
 
 __all__ = [
     "Account",
     "SignUpRequest",
     "LoginRequest",
-    "ChangeInfoRequest"
+    "ChangeInfoRequest",
+    "GetAllRequest"
 ]

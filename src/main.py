@@ -46,7 +46,7 @@ app = FastAPI(
         "name": "Dat Trong Ha - 20195851",
         "email": "dat.ht195851@sis.hust.edu.vn"
     },
-    openapi_prefix="/thesis_2/api/v1"
+    root_path="/thesis_2/api/v1"
 )
 
 @app.get("/")
@@ -64,16 +64,15 @@ async def sign_up(request: SignUpRequest):
     return process_sign_up(request)
 
 
-@app.put("/users/{username}/change_info", description="Change info account", tags=['Basic'])
-async def change_info(username: str, request: ChangeInfoRequest, token: str = Header(alias="x_secret_token")):
-    return process_change_info(username, request, token)
+@app.post("/users/change_info", description="Change password", tags=['Basic'])
+async def change_info(request: ChangeInfoRequest):
+    return process_change_info(request)
+
+@app.post("/admin/accounts", description="Get information account in SIS, ", tags=['Admin'])
+async def get_all_users(request: GetAllRequest):
+    return process_get_all_users(request)
 
 
-@app.get("/admin/accounts", description="Get information account in SIS, ", tags=['Admin'])
-async def get_all_users(token_admin: str = Header(alias="x_secret_token")):
-    return process_get_all_users(token_admin)
-
-
-@app.delete("/admin/offs/{identity_number}", description="Delete account with given username", tags=['Admin'])
-async def delete_account(identity_number: str, token: str = Header(alias="x_secret_token")):
-    return process_delete_account(identity_number, token)
+# @app.delete("/admin/offs/{identity_number}", description="Delete account with given username", tags=['Admin'])
+# async def delete_account(identity_number: str, token: str = Header(alias="x_secret_token")):
+#     return process_delete_account(identity_number, token)
