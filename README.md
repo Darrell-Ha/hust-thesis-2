@@ -2,6 +2,6 @@
 
 ## Modeling service Login Account
 
-![overall](docs\images\project\overall.png)
+![overall](https://raw.githubusercontent.com/Darrell-Ha/hust-thesis-2/master/docs/images/project/overall.png)
 
 ##
